@@ -1,16 +1,12 @@
-from fastapi import FastAPI, Request
-from httpx import AsyncClient
+from fastapi import Request
 
-from config import NEWS_PARSER
-
-app = FastAPI()
-client = AsyncClient()
+from src.app import app, client, config
 
 
 @app.post('/api/parser/url')
 async def url_parser(request: Request):
     url = (await request.json())['url']
-    response = await client.get(NEWS_PARSER + url)
+    response = await client.get(config['NEWS_PARSER'] + url)
     return {}
 
 

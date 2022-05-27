@@ -1,3 +1,7 @@
 fastapi
 httpx
 uvicorn
+fastapi-jwt-auth
+sqlalchemy
+databases
+pyyaml
