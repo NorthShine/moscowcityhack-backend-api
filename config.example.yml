@@ -1,4 +1,5 @@
-NEWS_PARSER: 'http://localhost:1234/'
+NEWS_PARSER: 'http://185.209.29.54:3001/api/v1?url='
+SEARX_URL: 'http://127.0.0.1:8888/search'
 
 ADMIN_USERNAME: 'admin'
 ADMIN_PASSWORD: 'admin'

@@ -2,6 +2,7 @@ from fastapi import Request, APIRouter
 from httpx import AsyncClient
 
 from config import get_config
+from searx_manager import SearxManager
 
 parser_router = APIRouter(
     prefix='/api/parser',
@@ -9,6 +10,7 @@ parser_router = APIRouter(
 )
 client = AsyncClient()
 config = get_config()
+searx = SearxManager(config, client)
 
 
 @parser_router.post('/url')
@@ -16,7 +18,8 @@ async def url_parser(request: Request):
     url = (await request.json())['url']
     response = await client.get(config['NEWS_PARSER'] + url, timeout=10000)
     data = response.json()
-    return {'title': data['title'], 'author': data['author']}
+    data = await searx.search(data['author'], data['title'])
+    return {'data': data}
 
 
 @parser_router.post('/text')
