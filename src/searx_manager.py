@@ -27,10 +27,18 @@ class SearxManager:
         }
         if await self.is_trusted_url(author_response['url']) or await self.is_trusted_url(title_response['url']):
             parsed_data['is_trusted_url'] = True
-        if title in title_response['title'] or title_response['title'] in title:
+        if (
+            title in title_response['title'] or
+            title_response['title'] in title or
+            title in title_response['content']
+        ):
             parsed_data['article_url'] = title_response['pretty_url']
             parsed_data['is_real_article'] = True
-        if author in author_response['title'] or author in author_response['url']:
+        if (
+            author in author_response['title'] or
+            author in author_response['url'] or
+            author in author_response['content']
+        ):
             parsed_data['is_real_author'] = True
 
         return parsed_data
