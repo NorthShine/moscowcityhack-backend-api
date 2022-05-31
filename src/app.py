@@ -1,16 +1,16 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
-from httpx import AsyncClient
 from fastapi_jwt_auth import AuthJWT
 from fastapi_jwt_auth.exceptions import AuthJWTException
 
-from src.config import get_config
-from src.db import database
-from src.schemas import Settings
+from db import database
+from schemas import Settings
+from views.admin import admin_router
+from views.parser import parser_router
 
 app = FastAPI()
-client = AsyncClient()
-config = get_config()
+app.include_router(admin_router)
+app.include_router(parser_router)
 
 
 @app.on_event('startup')

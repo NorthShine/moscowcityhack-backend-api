@@ -1,4 +1,4 @@
-NEWS_PARSER = 'http://localhost:1234/'
+NEWS_PARSER: 'http://localhost:1234/'
 
-ADMIN_USERNAME = 'admin'
-ADMIN_PASSWORD = 'admin'
+ADMIN_USERNAME: 'admin'
+ADMIN_PASSWORD: 'admin'

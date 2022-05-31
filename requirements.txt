@@ -5,3 +5,4 @@ fastapi-jwt-auth
 sqlalchemy
 databases
 pyyaml
+aiosqlite
