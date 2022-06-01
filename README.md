@@ -9,3 +9,5 @@ Run project:
 5. Setup searx (https://searx.github.io/searx/admin/installation-searx.html)
 6. python src/main.py
 
+
+There are two blueprints - admin and parser. Admin contains protected endpoints for whitelist. Parser contains endpoints for url and text parsers - they are send data to searx and returns parsed data (found information about author, title, article, etc).
