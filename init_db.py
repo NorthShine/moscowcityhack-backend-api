@@ -1,3 +1,5 @@
+import asyncio
+
 from src.config import get_config
 from src.db import database, users
 
@@ -9,3 +11,7 @@ async def init_db():
         password=config['ADMIN_PASSWORD'],
     )
     await database.execute(query)
+
+
+if __name__ == '__main__':
+    asyncio.run(init_db())
