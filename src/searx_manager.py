@@ -32,7 +32,9 @@ class SearxManager:
             'is_trusted_url': False,
             'is_real_author': False,
             'is_real_article': False,
-            'article_url': None,
+            'found_authors': [],
+            'found_titles': [],
+            'found_articles': [],
             'author': author,
             'title': title,
             'author_responses': author_responses,
@@ -58,6 +60,7 @@ class SearxManager:
                            response.get('content', '')
             if author in author_title:
                 parsed_data['is_real_author'] = True
+                parsed_data['found_authors'].append(author_title)
 
     async def check_title_responses(self, title_responses, parsed_data, title):
         for response in title_responses:
@@ -67,7 +70,8 @@ class SearxManager:
                                       response.get('title') in title
 
             if are_titles_intersecting or title in response.get('content'):
-                parsed_data['article_url'] = response['pretty_url']
+                parsed_data['found_articles'].append(response['pretty_url'])
+                parsed_data['found_titles'].append(response.get('title'))
                 parsed_data['is_real_article'] = True
 
     async def make_query(self, query):
