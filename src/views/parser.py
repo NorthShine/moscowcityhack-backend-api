@@ -20,11 +20,12 @@ async def url_parser(request: Request):
     data = response.json()
     try:
         data = await searx.search(
+            data['text'],
             data['author'],
             data['title'],
             data['description'],
-            data['text'],
             url,
+            data.get('isArticle', True),
         )
     except Exception as e:
         data = {'error': str(e)}
@@ -33,5 +34,20 @@ async def url_parser(request: Request):
 
 @parser_router.post('/text')
 async def text_parser(request: Request):
-    text = (await request.json())['text']
-    return {}
+    data = await request.json()
+    text = data.get('text')
+    author = data.get('author')
+    title = data.get('title')
+
+    if text is None:
+        return {'data': {'error': 'text field is required'}}
+
+    try:
+        data = await searx.search(
+            text,
+            author,
+            title,
+        )
+    except Exception as e:
+        data = {'error': str(e)}
+    return {'data': data}
