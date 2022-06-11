@@ -14,15 +14,15 @@ class SearxManager:
     async def search(self, author, title, description, text, url):
         author_response = await self.make_query(author)
         if author_response is not None:
-            author_response = author_response[0]
+            author_responses = author_response[:5]
         else:
-            author_response = {"url": "No url found"}
+            author_responses = [{"url": "No url found"}]
 
         title_response = await self.make_query(title)
         if title_response is not None:
-            title_response = title_response[0]
+            title_responses = title_response[:5]
         else:
-            title_response = {"url": "No url found"}
+            title_responses = {"url": "No url found"}
 
         text = text or description
         nonuniqueness_hits = await self.check_nonuniqueness(text)
@@ -32,35 +32,47 @@ class SearxManager:
             'is_trusted_url': False,
             'is_real_author': False,
             'is_real_article': False,
-            'article_url': None,
+            'found_authors': [],
+            'found_titles': [],
+            'found_articles': [],
             'author': author,
             'title': title,
-            'author_response': author_response,
-            'title_response': title_response,
+            'author_responses': author_responses,
+            'title_responses': title_responses,
             'text': text,
         }
 
-        is_author_url_trusted = await self.is_trusted_url(author_response['url'])
-        is_title_url_trusted = await self.is_trusted_url(title_response['url'])
-        is_url_trusted = await self.is_trusted_url(url) 
-        if is_author_url_trusted or is_title_url_trusted or is_url_trusted:
+        is_url_trusted = await self.is_trusted_url(url)
+        if is_url_trusted:
             parsed_data['is_trusted_url'] = True
 
-        author_title = author_response.get('title', '') + ' ' + \
-                       author_response.get('url', '') + ' ' + \
-                       author_response.get('content', '')
-        
-        if author in author_title:
-            parsed_data['is_real_author'] = True
-        
-        are_titles_intersecting = title in title_response.get('title') or \
-                                  title_response.get('title') in title
-                 
-        if are_titles_intersecting or title in title_response.get('content'):
-            parsed_data['article_url'] = title_response['pretty_url']
-            parsed_data['is_real_article'] = True
+        await self.check_author_responses(author_responses, parsed_data, author)
+        await self.check_title_responses(title_responses, parsed_data, title)
 
         return parsed_data
+
+    async def check_author_responses(self, author_responses, parsed_data, author):
+        for response in author_responses:
+            if await self.is_trusted_url(response['url']):
+                parsed_data['is_trusted_url'] = True
+            author_title = response.get('title', '') + ' ' + \
+                           response.get('url', '') + ' ' + \
+                           response.get('content', '')
+            if author in author_title:
+                parsed_data['is_real_author'] = True
+                parsed_data['found_authors'].append(author_title)
+
+    async def check_title_responses(self, title_responses, parsed_data, title):
+        for response in title_responses:
+            if await self.is_trusted_url(response['url']):
+                parsed_data['is_trusted_url'] = True
+            are_titles_intersecting = title in response.get('title') or \
+                                      response.get('title') in title
+
+            if are_titles_intersecting or title in response.get('content'):
+                parsed_data['found_articles'].append(response['pretty_url'])
+                parsed_data['found_titles'].append(response.get('title'))
+                parsed_data['is_real_article'] = True
 
     async def make_query(self, query):
         if query is None:
