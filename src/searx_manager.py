@@ -47,7 +47,7 @@ class SearxManager:
             parsed_data['is_trusted_url'] = True
 
         await self.check_author_responses(author_responses, parsed_data, author)
-        await self.check_title_responses(title_responses, parsed_data, title)
+        await self.check_title_responses(title_responses, parsed_data, title, url)
 
         return parsed_data
 
@@ -62,14 +62,21 @@ class SearxManager:
                 parsed_data['is_real_author'] = True
                 parsed_data['found_authors'].append(author_title)
 
-    async def check_title_responses(self, title_responses, parsed_data, title):
+    async def check_title_responses(self, title_responses, parsed_data, title, url):
         for response in title_responses:
             if await self.is_trusted_url(response['url']):
                 parsed_data['is_trusted_url'] = True
             are_titles_intersecting = title in response.get('title') or \
                                       response.get('title') in title
 
-            if are_titles_intersecting or title in response.get('content'):
+            are_urls_intersecting = url in response.get('url') or \
+                                    url in response.get('pretty_url')
+
+            if (
+                    are_titles_intersecting or
+                    are_urls_intersecting or
+                    title in response.get('content')
+            ):
                 parsed_data['found_articles'].append(response['pretty_url'])
                 parsed_data['found_titles'].append(response.get('title'))
                 parsed_data['is_real_article'] = True
