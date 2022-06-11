@@ -18,12 +18,15 @@ async def url_parser(request: Request):
     url = (await request.json())['url']
     response = await client.get(config['NEWS_PARSER'] + url, timeout=10000)
     data = response.json()
-    data = await searx.search(
-        data['author'],
-        data['title'],
-        data['description'],
-        data['text'],
-    )
+    try:
+        data = await searx.search(
+            data['author'],
+            data['title'],
+            data['description'],
+            data['text'],
+        )
+    except Exception as e:
+        data = {'error': str(e)}
     return {'data': data}
 
 
