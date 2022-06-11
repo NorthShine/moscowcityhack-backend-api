@@ -72,11 +72,7 @@ class SearxManager:
             are_urls_intersecting = url in response.get('url') or \
                                     url in response.get('pretty_url')
 
-            if (
-                    are_titles_intersecting or
-                    are_urls_intersecting or
-                    title in response.get('content')
-            ):
+            if are_titles_intersecting or are_urls_intersecting or title in response.get('content'):
                 parsed_data['found_articles'].append(response['pretty_url'])
                 parsed_data['found_titles'].append(response.get('title'))
                 parsed_data['is_real_article'] = True
