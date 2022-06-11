@@ -11,7 +11,7 @@ class SearxManager:
         self.client = client
         self.searx_url = config['SEARX_URL']
 
-    async def search(self, author, title, description, text):
+    async def search(self, author, title, description, text, url):
         author_response = await self.make_query(author)
         if author_response is not None:
             author_response = author_response[0]
@@ -42,8 +42,8 @@ class SearxManager:
 
         is_author_url_trusted = await self.is_trusted_url(author_response['url'])
         is_title_url_trusted = await self.is_trusted_url(title_response['url'])
-        
-        if is_author_url_trusted or is_title_url_trusted:
+        is_url_trusted = await self.is_trusted_url(url) 
+        if is_author_url_trusted or is_title_url_trusted or is_url_trusted:
             parsed_data['is_trusted_url'] = True
 
         author_title = author_response.get('title', '') + ' ' + \

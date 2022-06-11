@@ -23,6 +23,7 @@ async def url_parser(request: Request):
         data['title'],
         data['description'],
         data['text'],
+        url,
     )
     return {'data': data}
 

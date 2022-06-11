@@ -3,3 +3,5 @@ SEARX_URL: 'http://127.0.0.1:8888/search'
 
 ADMIN_USERNAME: 'admin'
 ADMIN_PASSWORD: 'admin'
+
+SECRET_KEY: 'bad_key'

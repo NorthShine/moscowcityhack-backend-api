@@ -29,25 +29,29 @@ async def sign_in_view(user: User, Authorize: AuthJWT = Depends()):
 
 
 @admin_router.get('/whitelist', response_model=List[Whitelist])
-async def get_whitelist_view():
+async def get_whitelist_view(Authorize: AuthJWT = Depends()):
+    Authorize.jwt_required()
     return await get_whitelist()
 
 
 @admin_router.post('/whitelist', response_model=Whitelist)
-async def add_url_to_whitelist_view(request: Request):
+async def add_url_to_whitelist_view(request: Request, Authorize: AuthJWT = Depends()):
+    Authorize.jwt_required()
     data = await request.json()
     url_obj_id = await add_url_to_whitelist(data['url'])
     return {**data, 'id': url_obj_id}
 
 
 @admin_router.patch('/whitelist/{url_id}', response_model=Whitelist)
-async def update_url_in_whitelist_view(url_id: int, request: Request):
+async def update_url_in_whitelist_view(url_id: int, request: Request, Authorize: AuthJWT = Depends()):
+    Authorize.jwt_required()
     data = await request.json()
     await update_url_from_whitelist(url_id, data['new_url'])
     return {'id': url_id, 'url': data['new_url']}
 
 
 @admin_router.delete('/whitelist/{url_id}')
-async def delete_url_from_whitelist_view(url_id: int):
+async def delete_url_from_whitelist_view(url_id: int, Authorize: AuthJWT = Depends()):
+    Authorize.jwt_required()
     await delete_url_from_whitelist(url_id)
     return {}

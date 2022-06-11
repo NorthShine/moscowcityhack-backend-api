@@ -1,5 +1,7 @@
 from pydantic import BaseModel
 
+from config import get_config
+
 
 class User(BaseModel):
     username: str
@@ -7,7 +9,7 @@ class User(BaseModel):
 
 
 class Settings(BaseModel):
-    jwt_secret_key: str = 'secret'
+    authjwt_secret_key: str = get_config()['SECRET_KEY']
 
 
 class Whitelist(BaseModel):
