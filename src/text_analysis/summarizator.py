@@ -12,7 +12,8 @@ def get_summary(article_text: str, model=model, tokenizer=tokenizer):
         padding="max_length",
         truncation=True,
         return_tensors="pt",
-    )["input_ids"]
+    )
+    input_ids = input_ids["input_ids"]
 
     output_ids = model.generate(
         input_ids=input_ids,

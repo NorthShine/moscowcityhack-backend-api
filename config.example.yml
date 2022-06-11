@@ -5,3 +5,4 @@ ADMIN_USERNAME: 'admin'
 ADMIN_PASSWORD: 'admin'
 
 SECRET_KEY: 'bad_key'
+MODEL_PATH: '/home/user/moscowcityhack-backend-api/d2v.model'

@@ -7,9 +7,11 @@ import nltk
 from pymystem3 import Mystem
 from sklearn.metrics.pairwise import cosine_similarity
 
+from config import get_config
+
 nltk.download('stopwords')
 
-MODEL_PATH = '/second_4tb/kuchuganova/other/fake_news/d2v.model'
+MODEL_PATH = (get_config())['MODEL_PATH']
 vec_size = 40
 alpha = 0.025
 
