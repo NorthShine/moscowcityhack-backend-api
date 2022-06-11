@@ -20,8 +20,8 @@ class SearxManager:
             url=None,
             is_article=True,
     ):
-        author_responses = [{"url": "No url found"}]
-        title_responses = [{"url": "No url found"}]
+        author_responses = []
+        title_responses = []
         if author is not None:
             author_response = await self.make_query(author)
             if author_response is not None:
