@@ -24,6 +24,7 @@ async def url_parser(request: Request):
             data['title'],
             data['description'],
             data['text'],
+            url,
         )
     except Exception as e:
         data = {'error': str(e)}

@@ -11,9 +11,18 @@ class SearxManager:
         self.client = client
         self.searx_url = config['SEARX_URL']
 
-    async def search(self, author, title, description, text):
-        author_response = (await self.make_query(author))[0]
-        title_response = (await self.make_query(title))[0]
+    async def search(self, author, title, description, text, url):
+        author_response = await self.make_query(author)
+        if author_response is not None:
+            author_response = author_response[0]
+        else:
+            author_response = {"url": "No url found"}
+
+        title_response = await self.make_query(title)
+        if title_response is not None:
+            title_response = title_response[0]
+        else:
+            title_response = {"url": "No url found"}
 
         text = text or description
         nonuniqueness_hits = await self.check_nonuniqueness(text)
@@ -30,21 +39,26 @@ class SearxManager:
             'title_response': title_response,
             'text': text,
         }
-        if await self.is_trusted_url(author_response['url']) or await self.is_trusted_url(title_response['url']):
+
+        is_author_url_trusted = await self.is_trusted_url(author_response['url'])
+        is_title_url_trusted = await self.is_trusted_url(title_response['url'])
+        is_url_trusted = await self.is_trusted_url(url) 
+        if is_author_url_trusted or is_title_url_trusted or is_url_trusted:
             parsed_data['is_trusted_url'] = True
-        if (
-            title in title_response['title'] or
-            title_response['title'] in title or
-            title in title_response['content']
-        ):
+
+        author_title = author_response.get('title', '') + ' ' + \
+                       author_response.get('url', '') + ' ' + \
+                       author_response.get('content', '')
+        
+        if author in author_title:
+            parsed_data['is_real_author'] = True
+        
+        are_titles_intersecting = title in title_response.get('title') or \
+                                  title_response.get('title') in title
+                 
+        if are_titles_intersecting or title in title_response.get('content'):
             parsed_data['article_url'] = title_response['pretty_url']
             parsed_data['is_real_article'] = True
-        if (
-            author in author_response['title'] or
-            author in author_response['url'] or
-            author in author_response['content']
-        ):
-            parsed_data['is_real_author'] = True
 
         return parsed_data
 
@@ -58,7 +72,7 @@ class SearxManager:
                 'format': 'json',
             },
         )
-        return response.json()['results']
+        return response.json().get('results')
 
     async def is_trusted_url(self, url):
         whitelist_urls = await get_whitelist()
