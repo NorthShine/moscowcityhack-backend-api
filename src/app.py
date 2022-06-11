@@ -8,10 +8,12 @@ from db import database
 from schemas import Settings
 from views.admin import admin_router
 from views.parser import parser_router
+from views.trust_badge import trust_badge_router
 
 app = FastAPI()
 app.include_router(admin_router)
 app.include_router(parser_router)
+app.include_router(trust_badge_router)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=['*'],
