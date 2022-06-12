@@ -34,17 +34,22 @@ class SearxManager:
                 title_responses = title_response[:5]
 
         text = text or description
-        uniqueness_hits = await self.check_uniqueness(text)
+        uniqueness_hits = []
+        for attribute in (title, text):
+            uniqueness_hits.append(await self.check_uniqueness(attribute))
 
         parsed_data = {
             'truth_percentage': 0,
-            'uniqueness_hits': uniqueness_hits,
+            'uniqueness_hits': max(uniqueness_hits),
             'is_trusted_url': False,
             'is_real_author': False,
             'is_real_article': False,
+            'author': author,
+            'title': title,
             'found_articles': [],
             'url': url,
             'is_article': is_article,
+            'text': text,
         }
 
         if url is not None:
@@ -83,6 +88,7 @@ class SearxManager:
             if are_titles_intersecting or url_hit or title in response.get('content'):
                 parsed_data['found_articles'].append(response['url'])
                 parsed_data['is_real_article'] = True
+                parsed_data['is_real_author'] = True
 
     async def check_text_responses(self, text, parsed_data):
         if len(text) > 170:
