@@ -46,9 +46,13 @@ class SearxManager:
                 title_responses = title_response[:5]
 
         text = text or description
+        uniqueness_hits = []
+        for attribute in (title, text):
+            uniqueness_hits.append(await self.check_uniqueness(attribute))
+
         parsed_data = {
             'truth_percentage': 0,
-            'uniqueness_hits': self.get_uniqueness_hits(title, text),
+            'uniqueness_hits': min(uniqueness_hits),
             'is_trusted_url': False,
             'is_real_author': False,
             'is_real_article': False,
@@ -70,30 +74,6 @@ class SearxManager:
         await self.check_text_responses(text, parsed_data)
 
         return parsed_data
-
-    def get_uniqueness_hits(self, title, text):
-        """Get uniqueness hits.
-        Cut text until hits is less than 100 or text is empty string."""
-        uniqueness_hits = []
-        uniqueness_hits.append(await self.check_uniqueness(title))
-
-        hits = 100
-        from_ = 0
-        to_ = 170
-        while hits == 100:
-            if len(text) > to_:
-                cut_text = text[from_:to_]
-                from_ = to_
-                to_ = to_ + 50
-
-                if cut_text == '':
-                    break
-            else:
-                cut_text = text
-            hits = await self.check_uniqueness(cut_text)
-            uniqueness_hits.append(hits)
-
-        return min(uniqueness_hits)
 
     async def check_author_responses(self, author_responses, parsed_data, author):
         """Parse searx responses and get information about author."""
