@@ -23,18 +23,24 @@ def get_text_tone(messages: List, model=model):  # firs orig news second checkin
     return res  # список из словарей каждый из которых обязательно содержит ключи 'negative' и 'positive'
 
 
-def compare_tone(source, data):
+def compare_tone(source, entry_article):
+    """
+        Entry article to source tone comparison
+        negative entry_tone_difference stands for
+            entry text is X percents more negative
+        positive entry_tone_difference stands for
+            entry text is X percents more positive"""
     source_sum = get_summary(source)
-    data_sum = get_summary(data)
-    source_tone, data_tone = get_text_tone([source_sum,data_sum])
+    data_sum = get_summary(entry_article)
+    source_tone, data_tone = get_text_tone([source_sum, data_sum])
     pos_diff = source_tone['positive'] - data_tone['positive']
     neg_diff = source_tone['negative'] - data_tone['negative']
     if (abs(neg_diff) > abs(pos_diff)) and neg_diff < 0:
-        return f'Введенная новость на {round(abs(neg_diff)*100)}% более негативна.'
+        return {"entry_tone_difference": round(abs(neg_diff)*100)}
     elif (abs(neg_diff) < abs(pos_diff)) and pos_diff > 0:
-        return f'Введенная новость на {round(abs(pos_diff)*100)}% более негативна.'
+        return {"entry_tone_difference": -round(abs(pos_diff)*100)}
     else:
-        return f'Тональности новостей совпадают.'
+        return {"entry_tone_difference": 0}
 
 
 if __name__ == '__main__':
