@@ -32,7 +32,7 @@ async def sign_in_view(user: User, Authorize: AuthJWT = Depends()):
 
 @admin_router.get('/whitelist')
 async def get_whitelist_view(
-        page: Optional[int] = None,
+        page: Optional[int] = 1,
         per_page: Optional[int] = 5,
         Authorize: AuthJWT = Depends(),
 ):
