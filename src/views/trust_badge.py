@@ -1,6 +1,7 @@
 from fastapi import Depends, Request, APIRouter
 from fastapi_jwt_auth import AuthJWT
 
+from config import get_config
 from use_cases import get_whitelist_by_id
 
 trust_badge_router = APIRouter(
@@ -22,12 +23,10 @@ async def set_trust_badge_by_id_view(request: Request, Authorize: AuthJWT = Depe
     Authorize.jwt_required()
     item_id = (await request.json())['id']
     whitelist_item = await get_whitelist_by_id(item_id)
-    origin = request.client.host
-    if 'http' not in origin:
-        origin = 'http://' + origin
+    origin = (get_config())['DOMAIN']
     if whitelist_item is not None:
         return {
             'script': f'<script async defer data-trustbadge-id=\"{item_id}\" '
-                      f'src=\”{origin}/trustbadge/script.js\”></script>',
+                      f'src=\"{origin}/trust-badge/script.js\"></script>',
         }
     return {'error': 'URL is not found in whitelist'}
