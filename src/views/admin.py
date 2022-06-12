@@ -1,5 +1,5 @@
 import math
-from typing import List, Optional
+from typing import Optional
 
 from fastapi import HTTPException, Depends, Request, APIRouter
 
@@ -37,12 +37,13 @@ async def get_whitelist_view(
         Authorize: AuthJWT = Depends(),
 ):
     Authorize.jwt_required()
+    whitelist_count = len(await get_whitelist())
     whitelist_items = await get_whitelist(page, per_page)
     return {
         'data': whitelist_items,
         'page': page,
         'per_page': per_page,
-        'last_page': math.ceil(len(whitelist_items) / per_page),
+        'last_page': math.ceil(whitelist_count / per_page),
     }
 
 

@@ -1,5 +1,6 @@
 import typing
 
+from sqlalchemy import func
 from db import users, whitelist, database
 
 
