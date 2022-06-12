@@ -1,7 +1,7 @@
 # moscowcityhack-backend-api
 ### Fake news determining for MoscowCityHack by the NorthShine team.
-####Based on neural network for text processing and parsing open news sources.
-####We use SearX (https://searx.github.io/searx/) for searching and parsing information.
+#### Based on neural network for text processing and parsing open news sources.
+#### We use SearX (https://searx.github.io/searx/) for searching and parsing information.
 
 ### Run project
 
