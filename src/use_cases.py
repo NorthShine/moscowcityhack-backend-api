@@ -11,15 +11,13 @@ async def get_user_by_username(username):
 async def get_whitelist(
         page: typing.Optional[int] = None,
         per_page: typing.Optional[int] = None,
+        q: typing.Optional[str] = None,
 ):
     query = whitelist.select()
+    if q is not None:
+        query = whitelist.select().filter(whitelist.c.url.ilike(f'%{q}%'))
     if page is not None and per_page is not None:
         query = query.limit(per_page).offset(page)
-    return await database.fetch_all(query)
-
-
-async def search_whitelist_item(q: str):
-    query = whitelist.select().filter(whitelist.c.url.ilike(f'%{q}%'))
     return await database.fetch_all(query)
 
 
