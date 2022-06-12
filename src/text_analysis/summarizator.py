@@ -7,11 +7,13 @@ model = MBartForConditionalGeneration.from_pretrained(model_name)
 
 def get_summary(article_text: str, model=model, tokenizer=tokenizer):
     input_ids = tokenizer(
-                [article_text],
-                max_length=600,
-                padding="max_length",
-                truncation=True,
-                return_tensors="pt")["input_ids"]
+        [article_text],
+        max_length=600,
+        padding="max_length",
+        truncation=True,
+        return_tensors="pt",
+    )
+    input_ids = input_ids["input_ids"]
 
     output_ids = model.generate(
                 input_ids=input_ids,
