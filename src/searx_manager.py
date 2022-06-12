@@ -1,4 +1,5 @@
 from text_analysis.compare_texts import comp_cosine_similarity
+from text_analysis.text_ton import compare_tone
 from use_cases import get_whitelist
 
 
@@ -88,19 +89,33 @@ class SearxManager:
             if are_titles_intersecting or url_hit or title in response.get('content'):
                 parsed_data['found_articles'].append(response['url'])
                 parsed_data['is_real_article'] = True
-                parsed_data['is_real_author'] = True
+                parsed_data['is_real_author'] = True 
 
     async def check_text_responses(self, text, parsed_data):
         if len(text) > 170:
             text = text[:170]
         text_responses = (await self.make_query(text))[:5]
+        max_truth_percentage = 0
+        max_tone_diff = 0
+
         for response in text_responses:
             title_hits = comp_cosine_similarity(text, response.get('title'))
             content_hits = comp_cosine_similarity(text, response.get('content'))
+            tone_diff = compare_tone(text, response.get('content'))
+            tone_diff = tone_diff['entry_tone_difference']
+            if tone_diff > max_tone_diff:
+                max_tone_diff = tone_diff
+
             if title_hits > 0.9 or content_hits > 0.9:
                 parsed_data['found_articles'].append(response['url'])
                 parsed_data['is_real_article'] = True
-                parsed_data['truth_percentage'] = int(float(max((title_hits, content_hits))) * 100)
+                percentage = int(float(max((title_hits, content_hits))) * 100)
+
+                if percentage > max_truth_percentage:
+                    max_truth_percentage = percentage
+
+        parsed_data['truth_percentage'] = max_truth_percentage
+        parsed_data['truth_percentage'] -= (max_truth_percentage / 100) * 20
 
     async def make_query(self, query):
         if query is None:

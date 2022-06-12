@@ -5,7 +5,7 @@ from dostoevsky.models import FastTextSocialNetworkModel
 
 # выполнить в терминале перед запуском, после установки requirements.txt
 # !python -m dostoevsky download fasttext-social-network-model
-from src.text_analysis.summarizator import get_summary
+from text_analysis.summarizator import get_summary
 
 tokenizer = RegexTokenizer()
 
@@ -30,9 +30,8 @@ def compare_tone(source, entry_article):
             entry text is X percents more negative
         positive entry_tone_difference stands for
             entry text is X percents more positive"""
-    source_sum = get_summary(source)
-    data_sum = get_summary(entry_article)
-    source_tone, data_tone = get_text_tone([source_sum, data_sum])
+
+    source_tone, data_tone = get_text_tone([source, entry_article])
     pos_diff = source_tone['positive'] - data_tone['positive']
     neg_diff = source_tone['negative'] - data_tone['negative']
     if (abs(neg_diff) > abs(pos_diff)) and neg_diff < 0:
