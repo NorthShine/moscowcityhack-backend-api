@@ -1,6 +1,5 @@
 import typing
 
-from sqlalchemy import func
 from db import users, whitelist, database
 
 
@@ -16,6 +15,11 @@ async def get_whitelist(
     query = whitelist.select()
     if page is not None and per_page is not None:
         query = query.limit(per_page).offset(page)
+    return await database.fetch_all(query)
+
+
+async def search_whitelist_item(q: str):
+    query = whitelist.select().filter(whitelist.c.url.ilike(f'%{q}%'))
     return await database.fetch_all(query)
 
 

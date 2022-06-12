@@ -8,6 +8,7 @@ from fastapi_jwt_auth import AuthJWT
 from schemas import User, Whitelist
 from use_cases import (
     add_url_to_whitelist,
+    search_whitelist_item,
     delete_url_from_whitelist,
     get_user_by_username,
     get_whitelist,
@@ -45,6 +46,12 @@ async def get_whitelist_view(
         'per_page': per_page,
         'last_page': math.ceil(whitelist_count / per_page),
     }
+
+
+@admin_router.get('/whitelist/search')
+async def search_whitelist_item_view(q: str, Authorize: AuthJWT = Depends()):
+    Authorize.jwt_required()
+    return {'data': await search_whitelist_item(q)}
 
 
 @admin_router.post('/whitelist', response_model=Whitelist)
