@@ -4,7 +4,6 @@ searx is required (https://searx.github.io/searx/).
 """
 
 from text_analysis.compare_texts import comp_cosine_similarity
-from text_analysis.summarizator import get_summary
 from use_cases import get_whitelist
 
 
@@ -54,7 +53,7 @@ class SearxManager:
         parsed_data = {
             'truth_percentage': 0,
             'uniqueness_hits': min(uniqueness_hits),
-            'alternative_title': get_summary(text),
+            # 'alternative_title': get_summary(text),
             'is_trusted_url': False,
             'is_real_author': False,
             'is_real_article': False,
