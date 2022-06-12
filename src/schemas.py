@@ -1,3 +1,5 @@
+from typing import Optional
+
 from pydantic import BaseModel
 
 from config import get_config
@@ -15,3 +17,4 @@ class Settings(BaseModel):
 class Whitelist(BaseModel):
     id: int
     url: str
+    last_page: Optional[int]

@@ -1,3 +1,5 @@
+import typing
+
 from db import users, whitelist, database
 
 
@@ -6,8 +8,13 @@ async def get_user_by_username(username):
     return await database.fetch_one(query)
 
 
-async def get_whitelist():
+async def get_whitelist(
+        page: typing.Optional[int] = None,
+        per_page: typing.Optional[int] = None,
+):
     query = whitelist.select()
+    if page is not None and per_page is not None:
+        query = query.limit(per_page).offset(page)
     return await database.fetch_all(query)
 
 

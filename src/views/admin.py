@@ -1,4 +1,6 @@
-from typing import List
+import math
+from typing import List, Optional
+
 from fastapi import HTTPException, Depends, Request, APIRouter
 
 from fastapi_jwt_auth import AuthJWT
@@ -28,10 +30,20 @@ async def sign_in_view(user: User, Authorize: AuthJWT = Depends()):
     return {'access_token': access_token}
 
 
-@admin_router.get('/whitelist', response_model=List[Whitelist])
-async def get_whitelist_view(Authorize: AuthJWT = Depends()):
+@admin_router.get('/whitelist')
+async def get_whitelist_view(
+        page: Optional[int] = None,
+        per_page: Optional[int] = 5,
+        Authorize: AuthJWT = Depends(),
+):
     Authorize.jwt_required()
-    return await get_whitelist()
+    whitelist_items = await get_whitelist(page, per_page)
+    return {
+        'data': whitelist_items,
+        'page': page,
+        'per_page': per_page,
+        'last_page': math.ceil(len(whitelist_items) / per_page),
+    }
 
 
 @admin_router.post('/whitelist', response_model=Whitelist)
