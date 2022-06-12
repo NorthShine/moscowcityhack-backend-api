@@ -53,6 +53,7 @@ class SearxManager:
 
         parsed_data = {
             'truth_percentage': 0,
+            'max_tone': 0,
             'uniqueness_hits': max(uniqueness_hits),
             'is_trusted_url': False,
             'is_real_author': False,
@@ -128,6 +129,7 @@ class SearxManager:
 
         parsed_data['truth_percentage'] = max_truth_percentage
         parsed_data['truth_percentage'] -= abs((max_truth_percentage / 100) * 20)
+        parsed_data['max_tone'] = max_tone_diff
 
     @staticmethod
     def compare_texts(original_text, response):
