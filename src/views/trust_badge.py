@@ -1,4 +1,5 @@
-from fastapi import Request, APIRouter
+from fastapi import Depends, Request, APIRouter
+from fastapi_jwt_auth import AuthJWT
 
 from use_cases import get_whitelist_by_id
 
@@ -17,7 +18,8 @@ async def get_trust_badge_by_id_view(id: int, request: Request):
 
 
 @trust_badge_router.post('/')
-async def set_trust_badge_by_id_view(request: Request):
+async def set_trust_badge_by_id_view(request: Request, Authorize: AuthJWT = Depends()):
+    Authorize.jwt_required()
     item_id = (await request.json())['id']
     whitelist_item = await get_whitelist_by_id(item_id)
     if whitelist_item is not None:
