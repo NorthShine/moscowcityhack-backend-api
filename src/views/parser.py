@@ -1,4 +1,4 @@
-from fastapi import Request, APIRouter
+from fastapi import Request, APIRouter, HTTPException
 from httpx import AsyncClient
 
 from config import get_config
@@ -28,7 +28,8 @@ async def url_parser(request: Request):
             data.get('isArticle', True),
         )
     except Exception as e:
-        data = {'error': str(e)}
+        reason = {'error': str(e)}
+        raise HTTPException(status_code=400, detail=reason)
     return {'data': data}
 
 
@@ -40,7 +41,8 @@ async def text_parser(request: Request):
     title = data.get('title')
 
     if text is None:
-        return {'data': {'error': 'text field is required'}}
+        reason = {'data': {'error': 'text field is required'}}
+        raise HTTPException(status_code=400, detail=reason) 
 
     try:
         data = await searx.search(
