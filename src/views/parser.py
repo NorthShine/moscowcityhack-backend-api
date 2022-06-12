@@ -1,6 +1,8 @@
+from typing import Optional
 from fastapi import Request, APIRouter, HTTPException
 from httpx import AsyncClient
 
+from pydantic import BaseModel
 from config import get_config
 from searx_manager import SearxManager
 
@@ -13,9 +15,19 @@ config = get_config()
 searx = SearxManager(config, client)
 
 
+class TextItem(BaseModel):
+    text: str
+    author: Optional[str] = None
+    title: Optional[str] = None
+
+
+class URLItem(BaseModel):
+    url: str
+
+
 @parser_router.post('/url')
-async def url_parser(request: Request):
-    url = (await request.json())['url']
+async def url_parser(item: URLItem):
+    url = item.url
     response = await client.get(config['NEWS_PARSER'] + url, timeout=10000)
     data = response.json()
     try:
@@ -34,15 +46,10 @@ async def url_parser(request: Request):
 
 
 @parser_router.post('/text')
-async def text_parser(request: Request):
-    data = await request.json()
-    text = data.get('text')
-    author = data.get('author')
-    title = data.get('title')
-
-    if text is None:
-        reason = {'data': {'error': 'text field is required'}}
-        raise HTTPException(status_code=400, detail=reason) 
+async def text_parser(text_item: TextItem):
+    text = text_item.text
+    author = text_item.author
+    title = text_item.title
 
     try:
         data = await searx.search(
