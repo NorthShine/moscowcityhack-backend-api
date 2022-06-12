@@ -16,9 +16,8 @@ def get_summary(article_text: str, model=model, tokenizer=tokenizer):
     input_ids = input_ids["input_ids"]
 
     output_ids = model.generate(
-        input_ids=input_ids,
-        no_repeat_ngram_size=4
-    )[0]
+                input_ids=input_ids,
+                no_repeat_ngram_size=4)[0]
 
     summary = tokenizer.decode(output_ids, skip_special_tokens=True)
     return summary
