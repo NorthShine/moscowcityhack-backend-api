@@ -95,7 +95,7 @@ class SearxManager:
             if title_hits > 0.9 or content_hits > 0.9:
                 parsed_data['found_articles'].append(response['pretty_url'])
                 parsed_data['is_real_article'] = True
-                parsed_data['truth_percentage'] = float(max((title_hits, content_hits))) * 100
+                parsed_data['truth_percentage'] = int(float(max((title_hits, content_hits))) * 100)
 
     async def make_query(self, query):
         if query is None:
