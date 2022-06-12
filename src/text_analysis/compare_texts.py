@@ -1,17 +1,19 @@
 import re
 from string import punctuation
 
+import yaml
 from gensim.models.doc2vec import Doc2Vec
 from nltk.corpus import stopwords
 import nltk
 from pymystem3 import Mystem
 from sklearn.metrics.pairwise import cosine_similarity
 
-from config import get_config
+with open('config.yml', 'r') as config_file:
+    config = yaml.safe_load(config_file)
 
 nltk.download('stopwords')
 
-MODEL_PATH = (get_config())['MODEL_PATH']
+MODEL_PATH = config['MODEL_PATH']
 vec_size = 40
 alpha = 0.025
 
