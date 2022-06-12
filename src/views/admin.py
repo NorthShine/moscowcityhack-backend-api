@@ -38,7 +38,7 @@ async def get_whitelist_view(
         Authorize: AuthJWT = Depends(),
 ):
     Authorize.jwt_required()
-    whitelist_count = len(await get_whitelist())
+    whitelist_count = len(await get_whitelist(q=q))
     whitelist_items = await get_whitelist(page, per_page, q)
     return {
         'data': whitelist_items,
