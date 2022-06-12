@@ -5,15 +5,10 @@
 
 ### Run project
 
-1. python3 -m venv venv
-2. source venv/bin/activate
-3. pip install -r requirements.txt
-4. pip install -r src/text_analysis/requirements.txt
-5. python -m dostoevsky download fasttext-social-network-model
-6. Create config.yml. Use config.example.yml as an example
-7. python init_db.py
-8. Setup searx (https://searx.github.io/searx/admin/installation-searx.html)
-9. python src/main.py
+1. make
+2. python init_db.py
+3. Setup searx (https://searx.github.io/searx/admin/installation-searx.html)
+4. python src/main.py
 
 
 ### Short info about Rest API
