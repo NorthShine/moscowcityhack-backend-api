@@ -18,7 +18,7 @@ class SearxManager:
             title=None,
             description=None,
             url=None,
-            is_article=True,
+            is_article=False,
     ):
         author_responses = []
         title_responses = []
@@ -33,10 +33,11 @@ class SearxManager:
                 title_responses = title_response[:5]
 
         text = text or description
-        nonuniqueness_hits = await self.check_nonuniqueness(text)
+        nonuniqueness_hits, nonuniqueness_hits_results = await self.check_nonuniqueness(text)
 
         parsed_data = {
             'nonuniqueness_hits': nonuniqueness_hits,
+            'nonuniqueness_hits_results': nonuniqueness_hits_results,
             'is_trusted_url': False,
             'is_real_author': False,
             'is_real_article': False,
@@ -46,8 +47,8 @@ class SearxManager:
             'found_contents': [],
             'author': author,
             'title': title,
-            'author_responses': author_responses,
-            'title_responses': title_responses,
+            # 'author_responses': author_responses,
+            # 'title_responses': title_responses,
             'text': text,
             'url': url,
             'is_article': is_article,
@@ -103,6 +104,8 @@ class SearxManager:
                 parsed_data['found_titles'].append(response.get('title'))
                 parsed_data['found_contents'].append(response.get('content'))
                 parsed_data['is_real_article'] = True
+        else:
+            parsed_data['text_responses'] = text_responses
 
     async def make_query(self, query):
         if query is None:
@@ -132,4 +135,4 @@ class SearxManager:
                 continue
             if text in result['title'] or text in result['content']:
                 hits += 1
-        return hits
+        return hits, results

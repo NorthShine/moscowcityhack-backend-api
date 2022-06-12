@@ -37,7 +37,7 @@ async def url_parser(item: URLItem):
             data['title'],
             data['description'],
             url,
-            data.get('isArticle', True),
+            data.get('isArticle', False),
         )
     except Exception as e:
         reason = {'error': str(e)}
@@ -58,5 +58,6 @@ async def text_parser(text_item: TextItem):
             title,
         )
     except Exception as e:
-        data = {'error': str(e)}
+        reason = {'error': str(e)}
+        raise HTTPException(status_code=400, detail=reason)
     return {'data': data}
