@@ -49,7 +49,8 @@ async def get_whitelist_view(
 
 
 @admin_router.get('/whitelist/search')
-async def search_whitelist_item_view(q: str):
+async def search_whitelist_item_view(q: str, Authorize: AuthJWT = Depends()):
+    Authorize.jwt_required()
     return {'data': await search_whitelist_item(q)}
 
 
