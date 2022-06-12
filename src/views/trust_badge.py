@@ -1,3 +1,7 @@
+"""
+Trust badge views.
+"""
+
 from fastapi import Depends, Request, APIRouter
 from fastapi_jwt_auth import AuthJWT
 
@@ -12,6 +16,7 @@ trust_badge_router = APIRouter(
 
 @trust_badge_router.get('/')
 async def get_trust_badge_by_id_view(id: int, request: Request):
+    """Get trust badge by id."""
     whitelist_item = await get_whitelist_by_id(id)
     if whitelist_item.url in request.client.host:
         return {'is_trusted': True}
@@ -20,6 +25,7 @@ async def get_trust_badge_by_id_view(id: int, request: Request):
 
 @trust_badge_router.post('/')
 async def set_trust_badge_by_id_view(request: Request, Authorize: AuthJWT = Depends()):
+    """Set trust badge by id."""
     Authorize.jwt_required()
     item_id = (await request.json())['id']
     whitelist_item = await get_whitelist_by_id(item_id)

@@ -1,3 +1,7 @@
+"""
+Parser views.
+"""
+
 from typing import Optional
 from fastapi import APIRouter, HTTPException
 from httpx import AsyncClient
@@ -29,6 +33,7 @@ class URLItem(BaseModel):
 
 @parser_router.post('/url')
 async def url_parser(item: URLItem):
+    """URL parser view."""
     url = item.url
     response = await client.get(config['NEWS_PARSER'] + url, timeout=10000)
     data = response.json()
@@ -64,6 +69,7 @@ async def url_parser(item: URLItem):
 
 @parser_router.post('/text')
 async def text_parser(text_item: TextItem):
+    """Text parser view."""
     text = text_item.text
     author = text_item.author
     title = text_item.title
