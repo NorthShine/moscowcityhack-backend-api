@@ -1,27 +1,44 @@
 import databases
-import sqlalchemy
+import sqlalchemy as sa
+from sqlalchemy_utils import PasswordType
 
 DATABASE_URL = 'sqlite:///./project.db'
 
 database = databases.Database(DATABASE_URL)
-metadata = sqlalchemy.MetaData()
+metadata = sa.MetaData()
 
-users = sqlalchemy.Table(
+users = sa.Table(
     'users',
     metadata,
-    sqlalchemy.Column('id', sqlalchemy.Integer, primary_key=True),
-    sqlalchemy.Column('username', sqlalchemy.String, unique=True),
-    sqlalchemy.Column('password', sqlalchemy.String),
+    sa.Column('id', sa.Integer, primary_key=True),
+    sa.Column('username', sa.String, unique=True),
+    sa.Column('password', PasswordType(
+        schemes=[
+            'pbkdf2_sha512',
+            'md5_crypt'
+        ],
+
+        deprecated=['md5_crypt']),
+    )
 )
-whitelist = sqlalchemy.Table(
+whitelist = sa.Table(
     'whitelist',
     metadata,
-    sqlalchemy.Column('id', sqlalchemy.Integer, primary_key=True),
-    sqlalchemy.Column('url', sqlalchemy.String, unique=True),
+    sa.Column('id', sa.Integer, primary_key=True),
+    sa.Column('url', sa.String, unique=True),
+)
+checked_urls = sa.Table(
+    'checked_urls',
+    metadata,
+    sa.Column('id', sa.Integer, primary_key=True),
+    sa.Column('url', sa.String),
+    sa.Column('is_trusted_url', sa.Boolean),
+    sa.Column('is_real_author', sa.Boolean),
+    sa.Column('is_real_article', sa.Boolean)
 )
 
 
-engine = sqlalchemy.create_engine(
+engine = sa.create_engine(
     DATABASE_URL, connect_args={'check_same_thread': False}
 )
 metadata.create_all(engine)

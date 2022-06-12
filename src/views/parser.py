@@ -6,6 +6,8 @@ from pydantic import BaseModel
 from config import get_config
 from searx_manager import SearxManager
 
+from use_cases import append_url_to_checked
+
 parser_router = APIRouter(
     prefix='/api/parser',
     tags=['parser'],
@@ -42,6 +44,17 @@ async def url_parser(item: URLItem):
     except Exception as e:
         reason = {'error': str(e)}
         raise HTTPException(status_code=400, detail=reason)
+
+    is_trusted_url = data.get('is_trusted_url', False)
+    is_real_author = data.get('is_real_author', False)
+    is_real_article = data.get('is_real_article', False)
+
+    await append_url_to_checked(
+        url,
+        is_trusted_url,
+        is_real_author,
+        is_real_article)
+
     return {'data': data}
 
 
