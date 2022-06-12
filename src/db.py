@@ -34,7 +34,9 @@ checked_urls = sa.Table(
     sa.Column('url', sa.String),
     sa.Column('is_trusted_url', sa.Boolean),
     sa.Column('is_real_author', sa.Boolean),
-    sa.Column('is_real_article', sa.Boolean)
+    sa.Column('is_real_article', sa.Boolean),
+    sa.Column('truth_percentage', sa.Integer),
+    sa.Column('uniqueness_hits', sa.Integer)
 )
 
 

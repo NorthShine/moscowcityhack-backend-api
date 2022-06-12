@@ -47,12 +47,16 @@ async def append_url_to_checked(
         url,
         is_trusted_url,
         is_real_author,
-        is_real_article):
+        is_real_article,
+        truth_percentage,
+        uniqueness_hits):
     query = checked_urls.insert().values(
         url=url,
         is_real_article=is_real_article,
         is_real_author=is_real_author,
-        is_trusted_url=is_trusted_url
+        is_trusted_url=is_trusted_url,
+        truth_percentage=truth_percentage,
+        uniqueness_hits=uniqueness_hits
     )
     return await database.execute(query)
 

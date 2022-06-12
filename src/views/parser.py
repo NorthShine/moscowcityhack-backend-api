@@ -48,12 +48,16 @@ async def url_parser(item: URLItem):
     is_trusted_url = data.get('is_trusted_url', False)
     is_real_author = data.get('is_real_author', False)
     is_real_article = data.get('is_real_article', False)
+    truth_percentage = data.get('truth_percentage', 0)
+    uniqueness_hits = data.get('uniqueness_hits', 0)
 
     await append_url_to_checked(
         url,
         is_trusted_url,
         is_real_author,
-        is_real_article)
+        is_real_article,
+        truth_percentage,
+        uniqueness_hits)
 
     return {'data': data}
 
