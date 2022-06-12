@@ -34,11 +34,11 @@ class SearxManager:
                 title_responses = title_response[:5]
 
         text = text or description
-        nonuniqueness_hits = await self.check_nonuniqueness(text)
+        uniqueness_hits = await self.check_uniqueness(text)
 
         parsed_data = {
             'truth_percentage': 0,
-            'nonuniqueness_hits': nonuniqueness_hits,
+            'uniqueness_hits': uniqueness_hits,
             'is_trusted_url': False,
             'is_real_author': False,
             'is_real_article': False,
@@ -116,14 +116,14 @@ class SearxManager:
                 return True
         return False
 
-    async def check_nonuniqueness(self, text):
-        hits = 0
+    async def check_uniqueness(self, text):
+        hits = 100
         results = await self.make_query(text)
         for result in results:
             title_hits = comp_cosine_similarity(text, result.get('title'))
             content_hits = comp_cosine_similarity(text, result.get('content'))
             if title_hits > 0.9 or content_hits > 0.9:
-                hits += 10
-            if hits >= 100:
+                hits -= 10
+            if hits <= 0:
                 break
         return hits
