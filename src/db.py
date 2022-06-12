@@ -1,3 +1,7 @@
+"""
+Setup database with default login and password for admin account.
+"""
+
 import databases
 import sqlalchemy as sa
 from sqlalchemy_utils import PasswordType

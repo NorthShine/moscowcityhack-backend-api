@@ -1,3 +1,7 @@
+"""
+Admin views.
+"""
+
 import math
 from typing import Optional
 
@@ -22,6 +26,7 @@ admin_router = APIRouter(
 
 @admin_router.post('/sign_in')
 async def sign_in_view(user: User, Authorize: AuthJWT = Depends()):
+    """Sign in by credentials."""
     user_obj = await get_user_by_username(user.username)
     if not user_obj or user.password != user_obj.password:
         raise HTTPException(status_code=401, detail='No such user with these credentials')
@@ -37,6 +42,7 @@ async def get_whitelist_view(
         per_page: Optional[int] = 5,
         Authorize: AuthJWT = Depends(),
 ):
+    """Get whitelist items. Also use for searching."""
     Authorize.jwt_required()
     whitelist_count = len(await get_whitelist(q=q))
     whitelist_items = await get_whitelist(page, per_page, q)
@@ -50,6 +56,7 @@ async def get_whitelist_view(
 
 @admin_router.post('/whitelist', response_model=Whitelist)
 async def add_url_to_whitelist_view(request: Request, Authorize: AuthJWT = Depends()):
+    """Add url to whitelist."""
     Authorize.jwt_required()
     data = await request.json()
     url_obj_id = await add_url_to_whitelist(data['url'])
@@ -58,6 +65,7 @@ async def add_url_to_whitelist_view(request: Request, Authorize: AuthJWT = Depen
 
 @admin_router.patch('/whitelist/{url_id}', response_model=Whitelist)
 async def update_url_in_whitelist_view(url_id: int, request: Request, Authorize: AuthJWT = Depends()):
+    """Update url in whitelist."""
     Authorize.jwt_required()
     data = await request.json()
     await update_url_from_whitelist(url_id, data['new_url'])
@@ -66,6 +74,7 @@ async def update_url_in_whitelist_view(url_id: int, request: Request, Authorize:
 
 @admin_router.delete('/whitelist/{url_id}')
 async def delete_url_from_whitelist_view(url_id: int, Authorize: AuthJWT = Depends()):
+    """Delete url from whitelist."""
     Authorize.jwt_required()
     await delete_url_from_whitelist(url_id)
     return {}
