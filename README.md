@@ -28,3 +28,13 @@ Statistics contains endpoint for getting stats per url.
 ### Infrastructure 
 
 ![project map](images/map.png)
+
+
+### Stack
+
+- FastAPI
+- SQLite
+- SQLAlchemy
+- Pytorch
+- Sklearn
+- nltk
