@@ -76,13 +76,12 @@ class SearxManager:
                                       response.get('title') in title
 
             if url is not None:
-                are_urls_intersecting = url in response.get('url') or \
-                                        url in response.get('pretty_url')
+                url_hit = url in response.get('url')
             else:
-                are_urls_intersecting = False
+                url_hit = False
 
-            if are_titles_intersecting or are_urls_intersecting or title in response.get('content'):
-                parsed_data['found_articles'].append(response['pretty_url'])
+            if are_titles_intersecting or url_hit or title in response.get('content'):
+                parsed_data['found_articles'].append(response['url'])
                 parsed_data['is_real_article'] = True
 
     async def check_text_responses(self, text, parsed_data):
@@ -93,7 +92,7 @@ class SearxManager:
             title_hits = comp_cosine_similarity(text, response.get('title'))
             content_hits = comp_cosine_similarity(text, response.get('content'))
             if title_hits > 0.9 or content_hits > 0.9:
-                parsed_data['found_articles'].append(response['pretty_url'])
+                parsed_data['found_articles'].append(response['url'])
                 parsed_data['is_real_article'] = True
                 parsed_data['truth_percentage'] = int(float(max((title_hits, content_hits))) * 100)
 
