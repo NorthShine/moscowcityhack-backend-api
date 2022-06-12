@@ -18,7 +18,7 @@ async def get_whitelist(
         query = whitelist.select().filter(whitelist.c.url.ilike(f'%{q}%'))
     if page is not None and per_page is not None:
         query = query.limit(per_page).offset(page)
-    return await database.fetch_all(query)
+    return await database.fetch_all(query.order_by(whitelist.c.id.desc()))
 
 
 async def add_url_to_whitelist(url):
