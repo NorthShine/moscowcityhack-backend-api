@@ -1,5 +1,5 @@
 from typing import Optional
-from fastapi import Request, APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException
 from httpx import AsyncClient
 
 from pydantic import BaseModel
