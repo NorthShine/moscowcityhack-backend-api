@@ -3,6 +3,8 @@ httpx
 uvicorn
 fastapi-jwt-auth
 sqlalchemy
+sqlalchemy_utils
 databases
 pyyaml
 aiosqlite
+passlib
