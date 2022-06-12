@@ -1,14 +1,25 @@
+"""
+SearX manager. Contains all methods for processing and parsing the found data about news.
+searx is required (https://searx.github.io/searx/).
+"""
+
 from text_analysis.compare_texts import comp_cosine_similarity
 from text_analysis.text_ton import compare_tone
 from use_cases import get_whitelist
 
 
 class SearxManager:
+    """SearX manager.
+
+    :param: config - dictionary with project configuration
+    :param: client - AsyncClient instance for making requests
+    """
     def __init__(
             self,
             config: dict,
             client,
     ):
+        """Initialization."""
         self.config = config
         self.client = client
         self.searx_url = config['SEARX_URL']
@@ -22,6 +33,7 @@ class SearxManager:
             url=None,
             is_article=False,
     ):
+        """Search author, title and text by using searx. Process found info."""
         author_responses = []
         title_responses = []
         if author is not None:
@@ -65,6 +77,7 @@ class SearxManager:
         return parsed_data
 
     async def check_author_responses(self, author_responses, parsed_data, author):
+        """Parse searx responses and get information about author."""
         for response in author_responses:
             if await self.is_trusted_url(response['url']):
                 parsed_data['is_trusted_url'] = True
@@ -75,6 +88,7 @@ class SearxManager:
                 parsed_data['is_real_author'] = True
 
     async def check_title_responses(self, title_responses, parsed_data, title, url=None):
+        """Parse searx responses and get information about title."""
         for response in title_responses:
             if await self.is_trusted_url(response['url']):
                 parsed_data['is_trusted_url'] = True
@@ -92,6 +106,7 @@ class SearxManager:
                 parsed_data['is_real_author'] = True 
 
     async def check_text_responses(self, text, parsed_data):
+        """Parse searx responses and get information about text."""
         if len(text) > 170:
             text = text[:170]
         text_responses = (await self.make_query(text))[:5]
@@ -118,6 +133,7 @@ class SearxManager:
         parsed_data['truth_percentage'] -= (max_truth_percentage / 100) * 20
 
     async def make_query(self, query):
+        """Make searx query. Return found results."""
         if query is None:
             return []
         response = await self.client.get(
@@ -130,6 +146,7 @@ class SearxManager:
         return response.json().get('results')
 
     async def is_trusted_url(self, url):
+        """Check if the url is whitelisted."""
         whitelist_urls = await get_whitelist()
         for whitelist_url in whitelist_urls:
             if whitelist_url.url in url:
@@ -137,6 +154,8 @@ class SearxManager:
         return False
 
     async def check_uniqueness(self, text):
+        """Analyze text uniqueness based on searx responses.
+        100 hits means that is unique text, 0 hits - is non-unique text."""
         hits = 100
         results = await self.make_query(text)
         for result in results:
