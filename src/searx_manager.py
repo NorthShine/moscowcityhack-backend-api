@@ -34,23 +34,15 @@ class SearxManager:
                 title_responses = title_response[:5]
 
         text = text or description
-        nonuniqueness_hits, nonuniqueness_hits_results = await self.check_nonuniqueness(text)
+        nonuniqueness_hits = await self.check_nonuniqueness(text)
 
         parsed_data = {
+            'truth_percentage': 0,
             'nonuniqueness_hits': nonuniqueness_hits,
-            'nonuniqueness_hits_results': nonuniqueness_hits_results,
             'is_trusted_url': False,
             'is_real_author': False,
             'is_real_article': False,
-            'found_authors': [],
-            'found_titles': [],
             'found_articles': [],
-            'found_contents': [],
-            'author': author,
-            'title': title,
-            # 'author_responses': author_responses,
-            # 'title_responses': title_responses,
-            'text': text,
             'url': url,
             'is_article': is_article,
         }
@@ -75,7 +67,6 @@ class SearxManager:
                            response.get('content', '')
             if author in author_title:
                 parsed_data['is_real_author'] = True
-                parsed_data['found_authors'].append(author_title)
 
     async def check_title_responses(self, title_responses, parsed_data, title, url=None):
         for response in title_responses:
@@ -92,7 +83,6 @@ class SearxManager:
 
             if are_titles_intersecting or are_urls_intersecting or title in response.get('content'):
                 parsed_data['found_articles'].append(response['pretty_url'])
-                parsed_data['found_titles'].append(response.get('title'))
                 parsed_data['is_real_article'] = True
 
     async def check_text_responses(self, text, parsed_data):
@@ -104,11 +94,8 @@ class SearxManager:
             content_hits = comp_cosine_similarity(text, response.get('content'))
             if title_hits > 0.9 or content_hits > 0.9:
                 parsed_data['found_articles'].append(response['pretty_url'])
-                parsed_data['found_titles'].append(response.get('title'))
-                parsed_data['found_contents'].append(response.get('content'))
                 parsed_data['is_real_article'] = True
-        else:
-            parsed_data['text_responses'] = text_responses
+                parsed_data['truth_percentage'] = max((title_hits, content_hits))
 
     async def make_query(self, query):
         if query is None:
@@ -135,9 +122,8 @@ class SearxManager:
         for result in results:
             title_hits = comp_cosine_similarity(text, result.get('title'))
             content_hits = comp_cosine_similarity(text, result.get('content'))
-            if text == result['title'] or text == result['content']:
-                hits += 10
-                continue
             if title_hits > 0.9 or content_hits > 0.9:
-                hits += 1
-        return hits, results
+                hits += 10
+            if hits >= 100:
+                break
+        return hits
