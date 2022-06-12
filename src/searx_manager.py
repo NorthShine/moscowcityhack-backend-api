@@ -1,3 +1,4 @@
+from text_analysis.compare_texts import comp_cosine_similarity
 from use_cases import get_whitelist
 
 
@@ -99,7 +100,9 @@ class SearxManager:
             text = text[:170]
         text_responses = (await self.make_query(text))[:5]
         for response in text_responses:
-            if text in response.get('content') or text in response.get('title') or response.get('title') in text:
+            title_hits = comp_cosine_similarity(text, response.get('title'))
+            content_hits = comp_cosine_similarity(text, response.get('content'))
+            if title_hits > 0.9 or content_hits > 0.9:
                 parsed_data['found_articles'].append(response['pretty_url'])
                 parsed_data['found_titles'].append(response.get('title'))
                 parsed_data['found_contents'].append(response.get('content'))
@@ -130,9 +133,11 @@ class SearxManager:
         hits = 0
         results = await self.make_query(text)
         for result in results:
+            title_hits = comp_cosine_similarity(text, result.get('title'))
+            content_hits = comp_cosine_similarity(text, result.get('content'))
             if text == result['title'] or text == result['content']:
                 hits += 10
                 continue
-            if text in result['title'] or text in result['content']:
+            if title_hits > 0.9 or content_hits > 0.9:
                 hits += 1
         return hits, results
