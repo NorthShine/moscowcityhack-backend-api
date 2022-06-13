@@ -109,7 +109,7 @@ class SearxManager:
             if are_titles_intersecting or \
                     url_hit or \
                     title in response.get('content') or \
-                    title_hits:
+                    title_hits > 0.9:
                 parsed_data['found_articles'].append(response['url'])
                 parsed_data['is_real_article'] = True
                 parsed_data['is_real_author'] = True
