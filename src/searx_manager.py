@@ -103,8 +103,13 @@ class SearxManager:
                 url_hit = url in response.get('url')
             else:
                 url_hit = False
-            parsed_data['found_titles'].append(response)
-            if are_titles_intersecting or url_hit or title in response.get('content'):
+
+            title_hits = comp_cosine_similarity(title, response.get('content'))
+
+            if are_titles_intersecting or \
+                    url_hit or \
+                    title in response.get('content') or \
+                    title_hits:
                 parsed_data['found_articles'].append(response['url'])
                 parsed_data['is_real_article'] = True
                 parsed_data['is_real_author'] = True
