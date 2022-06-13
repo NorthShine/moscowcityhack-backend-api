@@ -113,7 +113,7 @@ class SearxManager:
                 parsed_data['found_articles'].append(response['url'])
                 parsed_data['is_real_article'] = True
                 parsed_data['is_real_author'] = True
-                parsed_data['truth_percentage'] = int(float(title_hits)) * 100
+                parsed_data['truth_percentage'] = int(float(title_hits) * 100)
 
     async def check_text_responses(self, text, parsed_data):
         """Parse searx responses and get information about text."""
