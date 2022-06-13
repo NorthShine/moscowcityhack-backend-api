@@ -54,7 +54,8 @@ class SearxManager:
         parsed_data = {
             'truth_percentage': 0,
             'max_tone': 0,
-            'uniqueness_hits': max(uniqueness_hits),
+            'uniqueness_hits': min(uniqueness_hits),
+            # 'alternative_title': get_summary(text),
             'is_trusted_url': False,
             'is_real_author': False,
             'is_real_article': False,
@@ -64,6 +65,9 @@ class SearxManager:
             'url': url,
             'is_article': is_article,
             'text': text,
+            'found_authors': [],
+            'found_titles': [],
+            'found_content': [],
         }
 
         if url is not None:
@@ -85,6 +89,7 @@ class SearxManager:
             author_title = response.get('title', '') + ' ' + \
                            response.get('url', '') + ' ' + \
                            response.get('content', '')
+            parsed_data['found_authors'].append(response)
             if author in author_title:
                 parsed_data['is_real_author'] = True
 
@@ -101,10 +106,16 @@ class SearxManager:
             else:
                 url_hit = False
 
-            if are_titles_intersecting or url_hit or title in response.get('content'):
+            title_hits = comp_cosine_similarity(title, response.get('content'))
+
+            if are_titles_intersecting or \
+                    url_hit or \
+                    title in response.get('content') or \
+                    title_hits > 0.9:
                 parsed_data['found_articles'].append(response['url'])
                 parsed_data['is_real_article'] = True
-                parsed_data['is_real_author'] = True 
+                parsed_data['is_real_author'] = True
+                parsed_data['truth_percentage'] = int(float(title_hits) * 100)
 
     async def check_text_responses(self, text, parsed_data):
         """Parse searx responses and get information about text."""
@@ -119,6 +130,9 @@ class SearxManager:
             if tone_diff > max_tone_diff:
                 max_tone_diff = tone_diff
 
+            title_hits = comp_cosine_similarity(text, response.get('title'))
+            content_hits = comp_cosine_similarity(text, response.get('content'))
+            parsed_data['found_content'].append(response)
             if title_hits > 0.9 or content_hits > 0.9:
                 parsed_data['found_articles'].append(response['url'])
                 parsed_data['is_real_article'] = True
@@ -128,7 +142,7 @@ class SearxManager:
                     max_truth_percentage = percentage
 
         parsed_data['truth_percentage'] = max_truth_percentage
-        parsed_data['truth_percentage'] -= abs((max_truth_percentage / 100) * 20)
+        parsed_data['truth_percentage'] -= abs((max_tone_diff / 100) * 20)
         parsed_data['max_tone'] = max_tone_diff
 
     @staticmethod
@@ -167,6 +181,7 @@ class SearxManager:
         100 hits means that is unique text, 0 hits - is non-unique text."""
         hits = 100
         results = await self.make_query(text)
+
         for result in results:
             title_hits = comp_cosine_similarity(text, result.get('title'))
             content_hits = comp_cosine_similarity(text, result.get('content'))
