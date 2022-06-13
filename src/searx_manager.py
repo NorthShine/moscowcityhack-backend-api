@@ -63,6 +63,9 @@ class SearxManager:
             'url': url,
             'is_article': is_article,
             'text': text,
+            'found_authors': [],
+            'found_titles': [],
+            'found_content': [],
         }
 
         if url is not None:
@@ -84,6 +87,7 @@ class SearxManager:
             author_title = response.get('title', '') + ' ' + \
                            response.get('url', '') + ' ' + \
                            response.get('content', '')
+            parsed_data['found_authors'].append(response)
             if author in author_title:
                 parsed_data['is_real_author'] = True
 
@@ -99,7 +103,7 @@ class SearxManager:
                 url_hit = url in response.get('url')
             else:
                 url_hit = False
-
+            parsed_data['found_titles'].append(response)
             if are_titles_intersecting or url_hit or title in response.get('content'):
                 parsed_data['found_articles'].append(response['url'])
                 parsed_data['is_real_article'] = True
@@ -113,6 +117,7 @@ class SearxManager:
         for response in text_responses:
             title_hits = comp_cosine_similarity(text, response.get('title'))
             content_hits = comp_cosine_similarity(text, response.get('content'))
+            parsed_data['found_content'].append(response)
             if title_hits > 0.9 or content_hits > 0.9:
                 parsed_data['found_articles'].append(response['url'])
                 parsed_data['is_real_article'] = True
