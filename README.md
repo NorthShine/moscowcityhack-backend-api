@@ -25,6 +25,28 @@ Statistics contains endpoint for getting stats per url.
 ![project map](images/map.png)
 
 
+### User Interface
+
+![ui](images/1.jpg)
+
+User can insert an url to the news, or the text. Our backend application will parse SearX results by one of these parameters. Below these fields are statistics for each site.
+
+
+### Result example
+
+
+![result_example](images/2.png)
+
+There is the result example - you can see truth percentage (74.5%), fetched attributes and found relevant articles (among them must be the original news site). 
+
+
+### Admin panel
+
+![admin](images/3.png)
+
+A simple admin panel with which you can manage whitelist and give trust badges for trusted sites.
+
+
 ### Stack
 
 - FastAPI
