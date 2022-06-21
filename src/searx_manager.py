@@ -76,6 +76,8 @@ class SearxManager:
         await self.check_author_responses(author_responses, parsed_data, author)
         await self.check_title_responses(title_responses, parsed_data, title, url)
         await self.check_text_responses(text, parsed_data)
+        # uniqueness influence on truth_percentage is 25%
+        parsed_data['truth_percentage'] -= ((100 - min(uniqueness_hits)) / 100) * 25 
 
         return parsed_data
 
