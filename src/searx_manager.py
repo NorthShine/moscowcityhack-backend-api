@@ -4,6 +4,7 @@ searx is required (https://searx.github.io/searx/).
 """
 
 from text_analysis.compare_texts import comp_cosine_similarity
+from text_analysis.text_ton import compare_tone
 from use_cases import get_whitelist
 
 
@@ -52,6 +53,7 @@ class SearxManager:
 
         parsed_data = {
             'truth_percentage': 0,
+            'max_tone': 0,
             'uniqueness_hits': min(uniqueness_hits),
             # 'alternative_title': get_summary(text),
             'is_trusted_url': False,
@@ -122,14 +124,37 @@ class SearxManager:
         if len(text) > 170:
             text = text[:170]
         text_responses = (await self.make_query(text))[:5]
+        max_truth_percentage = 0
+        max_tone_diff = 0
+
         for response in text_responses:
+            title_hits, content_hits, tone_diff = self.compare_texts(text, response)
+            if tone_diff > max_tone_diff:
+                max_tone_diff = tone_diff
+
             title_hits = comp_cosine_similarity(text, response.get('title'))
             content_hits = comp_cosine_similarity(text, response.get('content'))
             parsed_data['found_content'].append(response)
             if title_hits > 0.9 or content_hits > 0.9:
                 parsed_data['found_articles'].append(response['url'])
                 parsed_data['is_real_article'] = True
-                parsed_data['truth_percentage'] = int(float(max((title_hits, content_hits))) * 100)
+                percentage = int(float(max((title_hits, content_hits))) * 100)
+
+                if percentage > max_truth_percentage:
+                    max_truth_percentage = percentage
+
+        parsed_data['truth_percentage'] = max_truth_percentage
+        parsed_data['truth_percentage'] -= abs((max_tone_diff / 100) * 20)
+        parsed_data['max_tone'] = max_tone_diff
+
+    @staticmethod
+    def compare_texts(original_text, response):
+        """Calculate tonality and sense similarity for two different texts."""
+        title_hits = comp_cosine_similarity(original_text, response.get('title'))
+        content_hits = comp_cosine_similarity(original_text, response.get('content'))
+        tone_diff = compare_tone(original_text, response.get('content'))
+        tone_diff = tone_diff['entry_tone_difference']
+        return title_hits, content_hits, tone_diff
 
     async def make_query(self, query):
         """Make searx query. Return found results."""
@@ -144,7 +169,8 @@ class SearxManager:
         )
         return response.json().get('results')
 
-    async def is_trusted_url(self, url):
+    @staticmethod
+    async def is_trusted_url(url):
         """Check if the url is whitelisted."""
         whitelist_urls = await get_whitelist()
         for whitelist_url in whitelist_urls:
@@ -161,6 +187,7 @@ class SearxManager:
         for result in results:
             title_hits = comp_cosine_similarity(text, result.get('title'))
             content_hits = comp_cosine_similarity(text, result.get('content'))
+
             if title_hits > 0.9 or content_hits > 0.9:
                 hits -= 10
             if hits <= 0:
